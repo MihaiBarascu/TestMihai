@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 
-// Force dynamic rendering to show updated images immediately
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+// Static generation with ISR for SEO benefits
+export const revalidate = 60 // 1 minute cache
 
 import { RelatedPosts } from '@/blocks/RelatedPosts/Component'
 import { PayloadRedirects } from '@/components/PayloadRedirects'

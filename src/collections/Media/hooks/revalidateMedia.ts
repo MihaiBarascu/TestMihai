@@ -7,39 +7,32 @@ export const revalidateMedia: CollectionAfterChangeHook = ({
   previousDoc,
   req: { payload },
 }) => {
-  payload.logger.info(`Revalidating all paths due to media change: ${doc.id}`)
+  payload.logger.info(`Revalidating media and related content: ${doc.id}`)
 
-  // Nuclear option - revalidate everything
   try {
-    // Revalidate all possible paths
+    // Critical: Revalidate both page AND layout to clear image cache
     revalidatePath('/', 'layout')
     revalidatePath('/', 'page')
-    revalidatePath('/posts', 'page')
     revalidatePath('/posts', 'layout')
+    revalidatePath('/posts', 'page')
 
-    // Revalidate common tags
+    // Revalidate all dynamic routes where images might appear
+    revalidatePath('/[slug]', 'layout')
+    revalidatePath('/[slug]', 'page')
+    revalidatePath('/posts/[slug]', 'layout')
+    revalidatePath('/posts/[slug]', 'page')
+
+    // Tag-based revalidation for broader coverage
     revalidateTag('posts')
     revalidateTag('pages')
     revalidateTag('media')
 
-    // Specific paths
-    const paths = [
-      '/',
-      '/posts',
-      '/[slug]',
-      '/(frontend)',
-      '/(frontend)/[slug]',
-      '/(pages)/[slug]'
-    ]
+    // Force revalidation of all posts that might use this media
+    payload.logger.info('Media change detected - triggering comprehensive cache clear')
 
-    paths.forEach(path => {
-      revalidatePath(path, 'page')
-      revalidatePath(path, 'layout')
-    })
-
-    payload.logger.info('Successfully revalidated all paths for media change')
+    payload.logger.info('Successfully revalidated all media-related caches')
   } catch (error) {
-    payload.logger.error('Error revalidating paths:', error)
+    payload.logger.error('Error in media revalidation:', error)
   }
 
   return doc

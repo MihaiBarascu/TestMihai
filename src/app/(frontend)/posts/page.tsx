@@ -1,8 +1,7 @@
 import type { Metadata } from 'next/types'
 
-// Force dynamic rendering to show new images immediately
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+// Static generation for better SEO, revalidated by hooks
+export const revalidate = 300 // 5 minutes cache
 
 import { CollectionArchive } from '@/components/CollectionArchive'
 import { PageRange } from '@/components/PageRange'

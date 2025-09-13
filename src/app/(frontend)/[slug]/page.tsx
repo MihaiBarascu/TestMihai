@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 
-// Force dynamic rendering to bypass cache issues with images
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+// Static generation with revalidation for better SEO and performance
+// Only media uploads trigger revalidation via hooks
+export const revalidate = 60 // 1 minute cache for balance
 
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import configPromise from '@payload-config'
