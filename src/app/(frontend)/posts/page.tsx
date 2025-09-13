@@ -1,5 +1,9 @@
 import type { Metadata } from 'next/types'
 
+// Force dynamic rendering to show new images immediately
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 import { CollectionArchive } from '@/components/CollectionArchive'
 import { PageRange } from '@/components/PageRange'
 import { Pagination } from '@/components/Pagination'

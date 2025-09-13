@@ -1,5 +1,9 @@
 import type { Metadata } from 'next'
 
+// Force dynamic rendering to show updated images immediately
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 import { RelatedPosts } from '@/blocks/RelatedPosts/Component'
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import configPromise from '@payload-config'

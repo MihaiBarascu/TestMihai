@@ -1,5 +1,9 @@
 import type { Metadata } from 'next'
 
+// Force dynamic rendering to bypass cache issues with images
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 import { PayloadRedirects } from '@/components/PayloadRedirects'
 import configPromise from '@payload-config'
 import { getPayload, type RequiredDataFromCollectionSlug } from 'payload'
