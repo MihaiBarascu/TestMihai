@@ -1,4 +1,4 @@
-import { revalidatePath } from 'next/cache'
+import { revalidatePath, revalidateTag } from 'next/cache'
 
 import type { CollectionAfterChangeHook } from 'payload'
 
@@ -7,21 +7,40 @@ export const revalidateMedia: CollectionAfterChangeHook = ({
   previousDoc,
   req: { payload },
 }) => {
-  // Revalidate regardless of status since media can be used anywhere
-  const paths = [
-    '/',           // Home page
-    '/posts',      // Posts listing
-    '/[slug]',     // Dynamic pages
-    '/(pages)/[slug]',  // Frontend pages
-  ]
+  payload.logger.info(`Revalidating all paths due to media change: ${doc.id}`)
 
-  paths.forEach(path => {
-    payload.logger.info(`Revalidating media-related path: ${path}`)
-    revalidatePath(path)
-  })
+  // Nuclear option - revalidate everything
+  try {
+    // Revalidate all possible paths
+    revalidatePath('/', 'layout')
+    revalidatePath('/', 'page')
+    revalidatePath('/posts', 'page')
+    revalidatePath('/posts', 'layout')
 
-  // Also revalidate tag-based cache
-  revalidatePath('/', 'layout')
+    // Revalidate common tags
+    revalidateTag('posts')
+    revalidateTag('pages')
+    revalidateTag('media')
+
+    // Specific paths
+    const paths = [
+      '/',
+      '/posts',
+      '/[slug]',
+      '/(frontend)',
+      '/(frontend)/[slug]',
+      '/(pages)/[slug]'
+    ]
+
+    paths.forEach(path => {
+      revalidatePath(path, 'page')
+      revalidatePath(path, 'layout')
+    })
+
+    payload.logger.info('Successfully revalidated all paths for media change')
+  } catch (error) {
+    payload.logger.error('Error revalidating paths:', error)
+  }
 
   return doc
 }
