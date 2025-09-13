@@ -1,38 +1,16 @@
-import { revalidatePath, revalidateTag } from 'next/cache'
-
 import type { CollectionAfterChangeHook } from 'payload'
+import { revalidateTag } from 'next/cache'
 
 export const revalidateMedia: CollectionAfterChangeHook = ({
   doc,
-  previousDoc,
-  req: { payload },
+  req: { payload, context },
 }) => {
-  payload.logger.info(`Revalidating media and related content: ${doc.id}`)
+  // Follow official Payload pattern - minimal and targeted
+  if (!context.disableRevalidate) {
+    payload.logger.info(`Revalidating for media change: ${doc.id}`)
 
-  try {
-    // Critical: Revalidate both page AND layout to clear image cache
-    revalidatePath('/', 'layout')
-    revalidatePath('/', 'page')
-    revalidatePath('/posts', 'layout')
-    revalidatePath('/posts', 'page')
-
-    // Revalidate all dynamic routes where images might appear
-    revalidatePath('/[slug]', 'layout')
-    revalidatePath('/[slug]', 'page')
-    revalidatePath('/posts/[slug]', 'layout')
-    revalidatePath('/posts/[slug]', 'page')
-
-    // Tag-based revalidation for broader coverage
-    revalidateTag('posts')
-    revalidateTag('pages')
-    revalidateTag('media')
-
-    // Force revalidation of all posts that might use this media
-    payload.logger.info('Media change detected - triggering comprehensive cache clear')
-
-    payload.logger.info('Successfully revalidated all media-related caches')
-  } catch (error) {
-    payload.logger.error('Error in media revalidation:', error)
+    // Only use tags - let pages handle their own revalidation
+    revalidateTag('posts-sitemap')
   }
 
   return doc
